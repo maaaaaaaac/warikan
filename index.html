@@ -527,6 +527,16 @@
       return inputStr.split(/[\s,、 ]+/).filter(name => name.trim() !== "");
     }
 
+    // 数値を小数第2位までに丸める関数
+    function round2(num) {
+      return Math.round(num * 100) / 100;
+    }
+
+    // 表示用の数値フォーマット（小数第2位まで、不要な末尾の0はカット、小数点以下がなければ整数）
+    function formatNum(num) {
+      return Number(round2(num).toFixed(2));
+    }
+
     function calculate() {
       const t = i18n[currentLang];
       const memberNames = parseNames(document.getElementById('allMembers').value);
@@ -549,8 +559,8 @@
         
         if (amount > 0 && names.length > 0) {
           names.forEach(name => {
-            extraPayMap[name] = (extraPayMap[name] || 0) + amount;
-            totalExtraAdded += amount;
+            extraPayMap[name] = round2((extraPayMap[name] || 0) + amount);
+            totalExtraAdded = round2(totalExtraAdded + amount);
           });
         }
       });
@@ -566,12 +576,12 @@
         const payer = row.querySelector('.item-payer').value.trim();
 
         if (price > 0) {
-          totalAmount += price;
+          totalAmount = round2(totalAmount + price);
           if (payer) {
-            paidByPerson[payer] = (paidByPerson[payer] || 0) + price;
+            paidByPerson[payer] = round2((paidByPerson[payer] || 0) + price);
           }
           const cur = t.currency ? t.currency : "";
-          itemSummaries.push(`・${name}: ${price.toLocaleString()}${cur} (${payer || t.defaultPayer})`);
+          itemSummaries.push(`・${name}: ${formatNum(price).toLocaleString()}${cur} (${payer || t.defaultPayer})`);
         }
       });
 
@@ -580,23 +590,22 @@
         return;
       }
 
-      const basePay = (totalAmount - totalExtraAdded) / totalPeople;
-      let roundedBasePay = Math.round(basePay);
+      const basePay = round2((totalAmount - totalExtraAdded) / totalPeople);
 
       const allMembers = memberNames.map(name => {
         const extraAdd = extraPayMap[name] || 0;
         return {
           name,
           isExtra: extraAdd > 0,
-          targetPay: roundedBasePay + extraAdd
+          targetPay: round2(basePay + extraAdd)
         };
       });
 
-      const calculatedTotal = allMembers.reduce((sum, m) => sum + m.targetPay, 0);
-      const diffAdjust = totalAmount - calculatedTotal;
+      const calculatedTotal = round2(allMembers.reduce((sum, m) => sum + m.targetPay, 0));
+      const diffAdjust = round2(totalAmount - calculatedTotal);
 
       if (diffAdjust !== 0 && allMembers.length > 0) {
-        allMembers[0].targetPay += diffAdjust;
+        allMembers[0].targetPay = round2(allMembers[0].targetPay + diffAdjust);
       }
 
       let memberResultsHTML = "";
@@ -604,21 +613,21 @@
 
       allMembers.forEach(m => {
         const paid = paidByPerson[m.name] || 0;
-        const diff = m.targetPay - paid;
+        const diff = round2(m.targetPay - paid);
         const nameDisplay = m.name + (t.san ? t.san : "");
         const cur = t.currency ? t.currency : "";
 
         let diffText = "";
         let cssClass = "";
         if (diff > 0) {
-          diffText = `${t.payText}: ${diff.toLocaleString()} ${cur}`.trim();
+          diffText = `${t.payText}: ${formatNum(diff).toLocaleString()} ${cur}`.trim();
           cssClass = "pay-plus";
-          shareTextMembers += `・${nameDisplay}: 【${diff.toLocaleString()}${cur} ${t.sharePay}】 (${t.costLabel}: ${m.targetPay.toLocaleString()}${cur} / ${t.paidLabel}: ${paid.toLocaleString()}${cur})\n`;
+          shareTextMembers += `・${nameDisplay}: 【${formatNum(diff).toLocaleString()}${cur} ${t.sharePay}】 (${t.costLabel}: ${formatNum(m.targetPay).toLocaleString()}${cur} / ${t.paidLabel}: ${formatNum(paid).toLocaleString()}${cur})\n`;
         } else if (diff < 0) {
-          const refund = Math.abs(diff);
-          diffText = `${t.receiveText}: ${refund.toLocaleString()} ${cur}`.trim();
+          const refund = round2(Math.abs(diff));
+          diffText = `${t.receiveText}: ${formatNum(refund).toLocaleString()} ${cur}`.trim();
           cssClass = "pay-minus";
-          shareTextMembers += `・${nameDisplay}: 【${refund.toLocaleString()}${cur} ${t.shareReceive}】 (${t.costLabel}: ${m.targetPay.toLocaleString()}${cur} / ${t.paidLabel}: ${paid.toLocaleString()}${cur})\n`;
+          shareTextMembers += `・${nameDisplay}: 【${formatNum(refund).toLocaleString()}${cur} ${t.shareReceive}】 (${t.costLabel}: ${formatNum(m.targetPay).toLocaleString()}${cur} / ${t.paidLabel}: ${formatNum(paid).toLocaleString()}${cur})\n`;
         } else {
           diffText = `${t.settledText}`;
           shareTextMembers += `・${nameDisplay}: ${t.shareSettled}\n`;
@@ -631,7 +640,7 @@
               <span class="pay-amount ${cssClass}">${diffText}</span>
             </div>
             <div class="person-detail">
-              ${t.costLabel}: ${m.targetPay.toLocaleString()}${cur} / ${t.paidLabel}: ${paid.toLocaleString()}${cur}
+              ${t.costLabel}: ${formatNum(m.targetPay).toLocaleString()}${cur} / ${t.paidLabel}: ${formatNum(paid).toLocaleString()}${cur}
             </div>
           </div>
         `;
@@ -640,7 +649,7 @@
       const noteText = totalExtraAdded > 0 ? `\n${t.shareNote}` : '';
       const cur = t.currency ? t.currency : "";
       shareText = `${t.shareTitle}\n`
-                + `${t.shareTotal}: ${totalAmount.toLocaleString()}${cur}\n\n`
+                + `${t.shareTotal}: ${formatNum(totalAmount).toLocaleString()}${cur}\n\n`
                 + `${t.shareBreakdown}\n${itemSummaries.join('\n')}\n\n`
                 + `${t.shareResult}\n${shareTextMembers}`
                 + `${noteText}\n`
@@ -651,8 +660,8 @@
       resultDiv.style.display = 'block';
       resultDiv.innerHTML = `
         <div class="total-summary">
-          <strong>${t.totalSummary}: ${totalAmount.toLocaleString()} ${cur}</strong><br>
-          <span style="font-size:0.85em; color:#8C8A82;">(${t.baseLabel}: ${roundedBasePay.toLocaleString()}${cur})</span>
+          <strong>${t.totalSummary}: ${formatNum(totalAmount).toLocaleString()} ${cur}</strong><br>
+          <span style="font-size:0.85em; color:#8C8A82;">(${t.baseLabel}: ${formatNum(basePay).toLocaleString()}${cur})</span>
         </div>
 
         ${memberResultsHTML}
