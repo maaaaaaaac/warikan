@@ -6,11 +6,11 @@
   <title>WARIKAN</title>
   
   <!-- タブに表示されるアイコン（ファビコン） -->
-<link rel="icon" href="/apple-touch-icon.png">
+  <link rel="icon" href="/apple-touch-icon.png">
 
-<!-- スマホのホーム画面に追加した時のアイコン -->
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<!-- ホーム画面追加用（PWA・アイコン設定） -->
+  <!-- スマホのホーム画面に追加した時のアイコン -->
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <!-- ホーム画面追加用（PWA・アイコン設定） -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="WARIKAN">
@@ -20,9 +20,14 @@
     * { box-sizing: border-box; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 450px; margin: 20px auto; padding: 15px; color: #333; background-color: #f8f9fa; }
     
-    /* 言語切替スイッチ */
-    .lang-switch { display: flex; justify-content: flex-end; margin-bottom: 10px; }
-    .lang-btn { background: #e0e0e0; border: none; padding: 6px 12px; font-size: 0.85em; font-weight: bold; cursor: pointer; border-radius: 6px; margin-left: 5px; }
+    /* 上部バー（リセットボタン ＆ 言語切替） */
+    .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .btn-reset { background: #e0e0e0; border: none; padding: 6px 10px; font-size: 1.1em; cursor: pointer; border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: background 0.1s; }
+    .btn-reset:active { background: #d0d0d0; }
+
+    /* 言語切替スイッチ（アイコン風） */
+    .lang-switch { display: flex; }
+    .lang-btn { background: #e0e0e0; border: none; padding: 6px 10px; font-size: 1.1em; cursor: pointer; border-radius: 6px; margin-left: 5px; display: flex; align-items: center; justify-content: center; }
     .lang-btn.active { background: #007aff; color: white; }
 
     .header-area { text-align: center; margin-bottom: 20px; }
@@ -74,10 +79,13 @@
 </head>
 <body>
 
-  <!-- 言語切替ボタン -->
-  <div class="lang-switch">
-    <button class="lang-btn active" id="btn-ja" onclick="setLanguage('ja')">Japanese</button>
-    <button class="lang-btn" id="btn-en" onclick="setLanguage('en')">English</button>
+  <!-- 上部バー（リセットボタン ＆ アイコン型言語切替） -->
+  <div class="top-bar">
+    <button class="btn-reset" onclick="resetForm()" title="Reset">🔄</button>
+    <div class="lang-switch">
+      <button class="lang-btn active" id="btn-ja" onclick="setLanguage('ja')" title="日本語">🇯🇵</button>
+      <button class="lang-btn" id="btn-en" onclick="setLanguage('en')" title="English">🌐</button>
+    </div>
   </div>
 
   <div class="header-area">
@@ -155,6 +163,7 @@
         alertMinItem: "最低1つの項目が必要です。",
         alertNoMembers: "メンバー全員の名前を入力してください。",
         alertNoAmount: "立替の金額を入力してください。",
+        confirmReset: "入力をすべてリセットしますか？",
         san: "さん",
         payText: "支払う額",
         receiveText: "受け取る額",
@@ -198,6 +207,7 @@
         alertMinItem: "At least one item is required.",
         alertNoMembers: "Please enter member names.",
         alertNoAmount: "Please enter total expense amount.",
+        confirmReset: "Are you sure you want to reset all inputs?",
         san: "",
         payText: "To Pay",
         receiveText: "To Receive",
@@ -291,9 +301,40 @@
       }
     }
 
+    function resetForm() {
+      const t = i18n[currentLang];
+      if (!confirm(t.confirmReset)) return;
+
+      document.getElementById('allMembers').value = '';
+
+      const itemList = document.getElementById('itemList');
+      itemList.innerHTML = `
+        <div class="item-row">
+          <input type="text" class="item-name" placeholder="${t.phItem}" data-i18n-ph="phItem" value="">
+          <input type="number" pattern="[0-9]*" class="item-price" inputmode="numeric" placeholder="${t.phPrice}" data-i18n-ph="phPrice" value="">
+          <input type="text" class="item-payer" placeholder="${t.phPayer}" data-i18n-ph="phPayer" value="">
+          <button class="btn-del" onclick="removeItem(this)">×</button>
+        </div>
+      `;
+
+      const extraList = document.getElementById('extraList');
+      extraList.innerHTML = `
+        <div class="extra-row">
+          <input type="text" class="extra-names" placeholder="${t.phExtraPayers}" data-i18n-ph="phExtraPayers" value="">
+          <input type="number" pattern="[0-9]*" class="extra-amount" inputmode="numeric" placeholder="${t.phExtra}" data-i18n-ph="phExtra" value="">
+          <button class="btn-del" onclick="removeExtra(this)">×</button>
+        </div>
+      `;
+
+      const resultDiv = document.getElementById('result');
+      resultDiv.style.display = 'none';
+      resultDiv.innerHTML = '';
+      shareText = '';
+    }
+
     function parseNames(inputStr) {
       if (!inputStr) return [];
-      return inputStr.split(/[\s,、　]+/).filter(name => name.trim() !== "");
+      return inputStr.split(/[\s,、 ]+/).filter(name => name.trim() !== "");
     }
 
     function calculate() {
@@ -308,7 +349,6 @@
         return;
       }
 
-      // 各自の追加負担額集計
       const extraPayMap = {};
       let totalExtraAdded = 0;
 
@@ -325,7 +365,6 @@
         }
       });
 
-      // 支払い項目の集計
       let totalAmount = 0;
       const paidByPerson = {};
       const itemSummaries = [];
@@ -350,7 +389,6 @@
         return;
       }
 
-      // ベース金額の計算
       const basePay = (totalAmount - totalExtraAdded) / totalPeople;
       let roundedBasePay = Math.round(basePay);
 
@@ -363,7 +401,6 @@
         };
       });
 
-      // 端数調整（最初のメンバーで吸収）
       const calculatedTotal = allMembers.reduce((sum, m) => sum + m.targetPay, 0);
       const diffAdjust = totalAmount - calculatedTotal;
 
@@ -371,7 +408,6 @@
         allMembers[0].targetPay += diffAdjust;
       }
 
-      // 表示およびメッセージ作成
       let memberResultsHTML = "";
       let shareTextMembers = "";
 
