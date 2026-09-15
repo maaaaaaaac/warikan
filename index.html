@@ -21,7 +21,7 @@
       margin: 30px auto;
       padding: 20px;
       color: #2C2C2A;
-      background-color: #F7F6F2; /* オーセンティックな温かみのあるペールトーン */
+      background-color: #F7F6F2;
       letter-spacing: 0.03em;
     }
     
@@ -286,7 +286,7 @@
     <div class="card-title" data-i18n="step1Title">1. メンバー</div>
     <div class="input-group" style="margin-bottom:0;">
       <label><span data-i18n="labelMembers">全員の名前</span><span class="sub-label" data-i18n="subSpace">（スペース区切り）</span></label>
-      <input type="text" id="allMembers" placeholder="例: 太郎 花子 次郎" data-i18n-ph="phMembers" value="">
+      <input type="text" id="allMembers" placeholder="たつや かずや みなみ" data-i18n-ph="phMembers" value="">
     </div>
   </div>
 
@@ -312,12 +312,12 @@
       <label><span data-i18n="labelExtraPayers">多めに払う人と追加額</span><span class="sub-label" data-i18n="subSpaceOptional">（任意）</span></label>
       <div id="extraList">
         <div class="extra-row">
-          <input type="text" class="extra-names" placeholder="多めに払う人の名前" data-i18n-ph="phExtraPayers" value="">
-          <input type="number" pattern="[0-9]*" class="extra-amount" inputmode="numeric" placeholder="+追加額" data-i18n-ph="phExtra" value="">
+          <input type="text" class="extra-names" placeholder="Extra Payer" data-i18n-ph="phExtraPayers" value="">
+          <input type="number" pattern="[0-9]*" class="extra-amount" inputmode="numeric" placeholder="Extra Amount" data-i18n-ph="phExtra" value="">
           <button class="btn-del" onclick="removeExtra(this)">×</button>
         </div>
       </div>
-      <button class="btn-add" id="btnAddExtra" onclick="addExtra()" data-i18n="btnAddExtra">＋ 追加</button>
+      <button class="btn-add" id="btnAddExtra" onclick="addExtra()" data-i18n="btnAddExtra">Add Payer</button>
     </div>
   </div>
 
@@ -341,13 +341,13 @@
         subSpace: "（スペース区切り）",
         subSpaceOptional: "（任意）",
         btnAddItem: "＋ 支払項目を追加",
-        btnAddExtra: "＋ 追加",
-        phMembers: "例: 太郎 花子 次郎",
+        btnAddExtra: "Add Payer",
+        phMembers: "たつや かずや みなみ",
         phItem: "項目",
         phPrice: "金額",
         phPayer: "払った人",
-        phExtraPayers: "多めに払う人の名前",
-        phExtra: "+追加額",
+        phExtraPayers: "Extra Payer",
+        phExtra: "Extra Amount",
         alertMinItem: "最低1つの項目が必要です。",
         alertNoMembers: "メンバー全員の名前を入力してください。",
         alertNoAmount: "立替の金額を入力してください。",
@@ -385,13 +385,13 @@
         subSpace: "(Separated by space)",
         subSpaceOptional: "(Optional)",
         btnAddItem: "+ Add Item",
-        btnAddExtra: "+ Add Extra Rule",
-        phMembers: "e.g., John Jane",
+        btnAddExtra: "Add Payer",
+        phMembers: "Mike Will Dustin",
         phItem: "Item",
         phPrice: "Amount",
         phPayer: "Paid by",
-        phExtraPayers: "Names paying extra",
-        phExtra: "+Extra",
+        phExtraPayers: "Extra Payer",
+        phExtra: "Extra Amount",
         alertMinItem: "At least one item is required.",
         alertNoMembers: "Please enter member names.",
         alertNoAmount: "Please enter total expense amount.",
@@ -603,7 +603,6 @@
         const paid = paidByPerson[m.name] || 0;
         const diff = m.targetPay - paid;
         const nameDisplay = m.name + (t.san ? t.san : "");
-        const icon = '—';
 
         let diffText = "";
         let cssClass = "";
