@@ -3,7 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>立替＆傾斜つき割り勘計算 / Split Bill Calculator</title>
+  <title>WARIKAN</title>
+  
+  <!-- ホーム画面追加用（PWA・アイコン設定） -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="WARIKAN">
+  <link rel="apple-touch-icon" href="https://dummyimage.com/180x180/007aff/ffffff.png&text=WARIKAN">
+
   <style>
     * { box-sizing: border-box; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 450px; margin: 20px auto; padding: 15px; color: #333; background-color: #f8f9fa; }
@@ -13,26 +20,36 @@
     .lang-btn { background: #e0e0e0; border: none; padding: 6px 12px; font-size: 0.85em; font-weight: bold; cursor: pointer; border-radius: 6px; margin-left: 5px; }
     .lang-btn.active { background: #007aff; color: white; }
 
-    h2 { text-align: center; font-size: 1.3em; margin-bottom: 20px; color: #111; }
+    .header-area { text-align: center; margin-bottom: 20px; }
+    h2 { font-size: 1.6em; margin: 0 0 4px 0; color: #111; font-weight: 800; letter-spacing: 0.5px; }
+    .subtitle { font-size: 0.85em; color: #666; margin: 0; }
+
     .card { background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; padding: 18px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 16px; }
     .card-title { font-weight: bold; font-size: 1.05em; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 2px solid #007aff; color: #007aff; }
     
     .input-group { margin-bottom: 14px; }
     label { display: block; margin-bottom: 6px; font-size: 0.85em; font-weight: bold; color: #444; }
     .sub-label { font-size: 0.75em; color: #777; font-weight: normal; margin-left: 4px; }
-    input { width: 100%; padding: 10px; font-size: 0.95em; border: 1px solid #ccc; border-radius: 6px; outline: none; }
-    input:focus { border-color: #007aff; }
+    input, select { width: 100%; padding: 10px; font-size: 0.95em; border: 1px solid #ccc; border-radius: 6px; outline: none; background-color: #fff; }
+    input:focus, select:focus { border-color: #007aff; }
 
     /* 立替項目の動的リスト */
     .item-row { display: flex; gap: 6px; margin-bottom: 8px; align-items: center; }
     .item-name { flex: 1.2; }
     .item-price { flex: 1; }
     .item-payer { flex: 1; }
-    .btn-del { background: #ff3b30; color: white; border: none; border-radius: 6px; width: 32px; height: 38px; font-weight: bold; cursor: pointer; flex-shrink: 0; }
-    .btn-add { width: 100%; padding: 8px; background: #e5f1ff; color: #007aff; border: 1px dashed #007aff; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 6px; }
+    /* タップ領域を広げた削除ボタン */
+    .btn-del { background: #ff3b30; color: white; border: none; border-radius: 6px; width: 40px; height: 40px; font-weight: bold; cursor: pointer; flex-shrink: 0; font-size: 1.2em; display: flex; align-items: center; justify-content: center; }
+    .btn-add { width: 100%; padding: 10px; background: #e5f1ff; color: #007aff; border: 1px dashed #007aff; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 6px; }
 
-    .btn-calc { width: 100%; padding: 14px; background-color: #007aff; color: white; border: none; border-radius: 8px; font-size: 1.05em; font-weight: bold; cursor: pointer; margin-top: 10px; }
-    .btn-calc:active { background-color: #0056b3; }
+    /* 多めに払う人と追加額を横並びにするレイアウト */
+    .extra-row { display: flex; gap: 6px; margin-bottom: 8px; align-items: center; }
+    .extra-names { flex: 1.8; }
+    .extra-amount { flex: 1; }
+
+    /* 独立したメインボタン（WARIKAN）: 上のマージンを詰めました */
+    .btn-calc { width: 100%; padding: 16px; background-color: #007aff; color: white; border: none; border-radius: 12px; font-size: 1.2em; font-weight: 800; letter-spacing: 1px; cursor: pointer; margin: 10px 0 10px 0; box-shadow: 0 4px 10px rgba(0, 122, 255, 0.3); transition: transform 0.1s; }
+    .btn-calc:active { transform: scale(0.98); background-color: #0056b3; }
     
     .result { margin-top: 20px; padding: 16px; background: #fff; border-radius: 12px; border: 1px solid #e0e0e0; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
     .result-item { padding: 10px 0; border-bottom: 1px solid #eee; }
@@ -40,8 +57,8 @@
     .person-name { font-weight: bold; font-size: 1.05em; }
     .person-detail { font-size: 0.85em; color: #666; margin-top: 2px; }
     .pay-amount { font-size: 1.1em; font-weight: bold; text-align: right; }
-    .pay-plus { color: #d9534f; } /* 支払う（赤） */
-    .pay-minus { color: #28a745; } /* もらう（緑） */
+    .pay-plus { color: #d9534f; }
+    .pay-minus { color: #28a745; }
 
     .total-summary { font-size: 0.9em; background: #f2f2f7; padding: 10px; border-radius: 8px; margin-bottom: 15px; }
 
@@ -54,88 +71,84 @@
 
   <!-- 言語切替ボタン -->
   <div class="lang-switch">
-    <button class="lang-btn active" id="btn-ja" onclick="setLanguage('ja')">日本語</button>
+    <button class="lang-btn active" id="btn-ja" onclick="setLanguage('ja')">Japanese</button>
     <button class="lang-btn" id="btn-en" onclick="setLanguage('en')">English</button>
   </div>
 
-  <h2 data-i18n="title">マルチ立替＆割り勘計算</h2>
+  <div class="header-area">
+    <h2>WARIKAN</h2>
+    <p class="subtitle">A simple way to split bills fairly.</p>
+  </div>
 
-  <!-- 1. 支払項目の入力 -->
+  <!-- 1. メンバー -->
   <div class="card">
-    <div class="card-title" data-i18n="step1Title">1. 支払った項目（立替）</div>
+    <div class="card-title" data-i18n="step1Title">1. メンバー</div>
+    <div class="input-group" style="margin-bottom:0;">
+      <label><span data-i18n="labelMembers">全員の名前</span><span class="sub-label" data-i18n="subSpace">（スペース区切り）</span></label>
+      <input type="text" id="allMembers" placeholder="名前" data-i18n-ph="phMembers" value="">
+    </div>
+  </div>
+
+  <!-- 2. 支払い -->
+  <div class="card">
+    <div class="card-title" data-i18n="step2Title">2. 支払い</div>
     <div id="itemList">
-      <!-- 初期表示の項目 -->
       <div class="item-row">
-        <input type="text" class="item-name" placeholder="項目 (例: ホテル)" data-i18n-ph="phItem" value="ホテル">
-        <input type="number" class="item-price" inputmode="numeric" placeholder="金額" data-i18n-ph="phPrice" value="15000">
-        <input type="text" class="item-payer" placeholder="払った人" data-i18n-ph="phPayer" value="田中">
-        <button class="btn-del" onclick="removeItem(this)">×</button>
-      </div>
-      <div class="item-row">
-        <input type="text" class="item-name" placeholder="項目 (例: お昼)" data-i18n-ph="phItem" value="お昼">
-        <input type="number" class="item-price" inputmode="numeric" placeholder="金額" data-i18n-ph="phPrice" value="4000">
-        <input type="text" class="item-payer" placeholder="払った人" data-i18n-ph="phPayer" value="たく">
-        <button class="btn-del" onclick="removeItem(this)">×</button>
-      </div>
-      <div class="item-row">
-        <input type="text" class="item-name" placeholder="項目 (例: 夕食)" data-i18n-ph="phItem" value="夕食">
-        <input type="number" class="item-price" inputmode="numeric" placeholder="金額" data-i18n-ph="phPrice" value="12000">
-        <input type="text" class="item-payer" placeholder="払った人" data-i18n-ph="phPayer" value="なつ">
+        <input type="text" class="item-name" placeholder="項目" data-i18n-ph="phItem" value="">
+        <input type="number" pattern="[0-9]*" class="item-price" inputmode="numeric" placeholder="金額" data-i18n-ph="phPrice" value="">
+        <input type="text" class="item-payer" placeholder="払った人" data-i18n-ph="phPayer" value="">
         <button class="btn-del" onclick="removeItem(this)">×</button>
       </div>
     </div>
-    <button class="btn-add" id="btnAdd" onclick="addItem()" data-i18n="btnAdd">＋ 支払項目を追加</button>
+    <button class="btn-add" id="btnAddItem" onclick="addItem()" data-i18n="btnAddItem">＋ 支払項目を追加</button>
   </div>
 
-  <!-- 2. メンバーと条件設定 -->
+  <!-- 3. 調整 -->
   <div class="card">
-    <div class="card-title" data-i18n="step2Title">2. メンバーと条件設定</div>
+    <div class="card-title" data-i18n="step3Title">3. 調整</div>
     
-    <div class="input-group">
-      <label for="drinkers"><span data-i18n="labelDrinkers">🍺 お酒を飲む人の名前</span><span class="sub-label" data-i18n="subSpace">（スペース区切り）</span></label>
-      <input type="text" id="drinkers" placeholder="例: 田中 なつ" data-i18n-ph="phDrinkers" value="田中 なつ">
+    <div class="input-group" style="margin-bottom:0;">
+      <label><span data-i18n="labelExtraPayers">多めに払う人と追加額</span><span class="sub-label" data-i18n="subSpaceOptional">（任意）</span></label>
+      <div id="extraList">
+        <div class="extra-row">
+          <input type="text" class="extra-names" placeholder="多めに払う人の名前" data-i18n-ph="phExtraPayers" value="">
+          <input type="number" pattern="[0-9]*" class="extra-amount" inputmode="numeric" placeholder="+追加額" data-i18n-ph="phExtra" value="">
+          <button class="btn-del" onclick="removeExtra(this)">×</button>
+        </div>
+      </div>
+      <button class="btn-add" id="btnAddExtra" onclick="addExtra()" data-i18n="btnAddExtra">＋ 追加</button>
     </div>
-
-    <div class="input-group">
-      <label for="nonDrinkers"><span data-i18n="labelNonDrinkers">🍵 飲まない人の名前</span><span class="sub-label" data-i18n="subSpace">（スペース区切り）</span></label>
-      <input type="text" id="nonDrinkers" placeholder="例: たく" data-i18n-ph="phNonDrinkers" value="たく">
-    </div>
-
-    <div class="input-group">
-      <label for="extra" data-i18n="labelExtra">飲んだ人が多めに支払う額 (1人あたり/円)</label>
-      <input type="number" id="extra" inputmode="numeric" placeholder="例: 1000" data-i18n-ph="phExtra" value="1000">
-    </div>
-
-    <button class="btn-calc" onclick="calculate()" data-i18n="btnCalc">精算額を計算する</button>
   </div>
 
-  <!-- 3. 計算結果 -->
+  <!-- 独立した計算ボタン -->
+  <button class="btn-calc" onclick="calculate()">WARIKAN</button>
+
+  <!-- 計算結果 -->
   <div class="result" id="result" style="display:none;"></div>
 
   <script>
     let currentLang = 'ja';
     let shareText = "";
 
-    // 多言語辞書
     const i18n = {
       ja: {
-        title: "マルチ立替＆割り勘計算",
-        step1Title: "1. 支払った項目（立替）",
-        step2Title: "2. メンバーと条件設定",
-        labelDrinkers: "🍺 お酒を飲む人の名前",
-        labelNonDrinkers: "🍵 飲まない人の名前",
+        step1Title: "1. メンバー",
+        step2Title: "2. 支払い",
+        step3Title: "3. 調整",
+        labelMembers: "全員の名前",
+        labelExtraPayers: "多めに払う人と追加額",
         subSpace: "（スペース区切り）",
-        labelExtra: "飲んだ人が多めに支払う額 (1人あたり/円)",
-        btnAdd: "＋ 支払項目を追加",
-        btnCalc: "精算額を計算する",
-        phItem: "項目 (例: ホテル)",
+        subSpaceOptional: "（任意）",
+        btnAddItem: "＋ 支払項目を追加",
+        btnAddExtra: "＋ 追加",
+        phMembers: "名前",
+        phItem: "項目",
         phPrice: "金額",
         phPayer: "払った人",
-        phDrinkers: "例: 田中 なつ",
-        phNonDrinkers: "例: たく",
-        phExtra: "例: 1000",
+        phExtraPayers: "多めに払う人の名前",
+        phExtra: "+追加額",
         alertMinItem: "最低1つの項目が必要です。",
-        alertNoPeople: "飲む人・飲まない人の名前を入力してください。",
+        alertNoMembers: "メンバー全員の名前を入力してください。",
         alertNoAmount: "立替の金額を入力してください。",
         san: "さん",
         payText: "支払う額",
@@ -148,7 +161,7 @@
         shareTotal: "合計",
         shareBreakdown: "■ 支払内訳",
         shareResult: "■ 最終精算額",
-        shareNote: "※🍺飲む人は+ {extra}円の傾斜計算済み",
+        shareNote: "※傾斜調整（多め負担）計算済み",
         shareThanks: "よろしくお願いします！",
         btnLine: "💬 LINEで送る",
         btnCopy: "📋 コピー",
@@ -157,30 +170,28 @@
         defaultItem: "項目",
         defaultPayer: "未設定",
         totalSummary: "全体の合計",
-        drinkerBase: "飲む人",
-        nonDrinkerBase: "飲まない人",
-        baseLabel: "基準",
+        baseLabel: "基本額",
         costLabel: "負担",
         paidLabel: "立替"
       },
       en: {
-        title: "Split Bill Calculator",
-        step1Title: "1. Paid Items (Expenses)",
-        step2Title: "2. Members & Rules",
-        labelDrinkers: "🍺 Alcohol Drinkers",
-        labelNonDrinkers: "🍵 Non-Drinkers",
+        step1Title: "1. Members",
+        step2Title: "2. Payments",
+        step3Title: "3. Adjustments",
+        labelMembers: "All Member Names",
+        labelExtraPayers: "People who pay extra & Amount",
         subSpace: "(Separated by space)",
-        labelExtra: "Extra amount per drinker",
-        btnAdd: "+ Add Item",
-        btnCalc: "Calculate Settlement",
-        phItem: "Item (e.g. Hotel)",
+        subSpaceOptional: "(Optional)",
+        btnAddItem: "+ Add Item",
+        btnAddExtra: "+ Add Extra Rule",
+        phMembers: "Names",
+        phItem: "Item",
         phPrice: "Amount",
         phPayer: "Paid by",
-        phDrinkers: "e.g. Alice Bob",
-        phNonDrinkers: "e.g. Charlie",
-        phExtra: "e.g. 1000",
+        phExtraPayers: "Names paying extra",
+        phExtra: "+Extra",
         alertMinItem: "At least one item is required.",
-        alertNoPeople: "Please enter member names.",
+        alertNoMembers: "Please enter member names.",
         alertNoAmount: "Please enter total expense amount.",
         san: "",
         payText: "To Pay",
@@ -193,7 +204,7 @@
         shareTotal: "Total",
         shareBreakdown: "■ Breakdown",
         shareResult: "■ Final Settlement",
-        shareNote: "*🍺 Drinkers pay +{extra} extra",
+        shareNote: "*Extra adjustments included",
         shareThanks: "Thank you!",
         btnLine: "💬 Share via LINE",
         btnCopy: "📋 Copy Result",
@@ -202,59 +213,48 @@
         defaultItem: "Item",
         defaultPayer: "Unknown",
         totalSummary: "Total Amount",
-        drinkerBase: "Drinkers",
-        nonDrinkerBase: "Non-Drinkers",
-        baseLabel: "base",
+        baseLabel: "Base",
         costLabel: "Cost",
         paidLabel: "Paid"
       }
     };
 
-    // 言語切り替え処理
     function setLanguage(lang) {
       currentLang = lang;
-      
-      // ボタンの見た目切替
       document.getElementById('btn-ja').classList.toggle('active', lang === 'ja');
       document.getElementById('btn-en').classList.toggle('active', lang === 'en');
 
-      // テキストの置換
       document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
         if (i18n[lang][key]) el.textContent = i18n[lang][key];
       });
 
-      // プレースホルダーの置換
       document.querySelectorAll('[data-i18n-ph]').forEach(el => {
         const key = el.getAttribute('data-i18n-ph');
         if (i18n[lang][key]) el.placeholder = i18n[lang][key];
       });
 
-      // すでに計算結果が出ている場合は再計算して言語反映
       if (document.getElementById('result').style.display !== 'none') {
         calculate();
       }
     }
 
-    // 項目行を追加する関数
     function addItem() {
       const itemList = document.getElementById('itemList');
       const div = document.createElement('div');
       div.className = 'item-row';
-      
       const t = i18n[currentLang];
       div.innerHTML = `
         <input type="text" class="item-name" placeholder="${t.phItem}" data-i18n-ph="phItem">
-        <input type="number" class="item-price" inputmode="numeric" placeholder="${t.phPrice}" data-i18n-ph="phPrice">
+        <input type="number" pattern="[0-9]*" class="item-price" inputmode="numeric" placeholder="${t.phPrice}" data-i18n-ph="phPrice">
         <input type="text" class="item-payer" placeholder="${t.phPayer}" data-i18n-ph="phPayer">
         <button class="btn-del" onclick="removeItem(this)">×</button>
       `;
       itemList.appendChild(div);
     }
 
-    // 項目行を削除する関数
     function removeItem(btn) {
-      const rows = document.querySelectorAll('.item-row');
+      const rows = document.querySelectorAll('#itemList .item-row');
       if (rows.length > 1) {
         btn.parentElement.remove();
       } else {
@@ -262,44 +262,81 @@
       }
     }
 
-    // 名前の分解関数
+    function addExtra() {
+      const extraList = document.getElementById('extraList');
+      const div = document.createElement('div');
+      div.className = 'extra-row';
+      const t = i18n[currentLang];
+      div.innerHTML = `
+        <input type="text" class="extra-names" placeholder="${t.phExtraPayers}" data-i18n-ph="phExtraPayers">
+        <input type="number" pattern="[0-9]*" class="extra-amount" inputmode="numeric" placeholder="${t.phExtra}" data-i18n-ph="phExtra">
+        <button class="btn-del" onclick="removeExtra(this)">×</button>
+      `;
+      extraList.appendChild(div);
+    }
+
+    function removeExtra(btn) {
+      const rows = document.querySelectorAll('#extraList .extra-row');
+      if (rows.length > 1) {
+        btn.parentElement.remove();
+      } else {
+        const row = rows[0];
+        row.querySelector('.extra-names').value = '';
+        row.querySelector('.extra-amount').value = '';
+      }
+    }
+
     function parseNames(inputStr) {
       if (!inputStr) return [];
       return inputStr.split(/[\s,、　]+/).filter(name => name.trim() !== "");
     }
 
-    // メイン計算処理
     function calculate() {
       const t = i18n[currentLang];
-      const drinkers = parseNames(document.getElementById('drinkers').value);
-      const nonDrinkers = parseNames(document.getElementById('nonDrinkers').value);
-      const extra = parseFloat(document.getElementById('extra').value) || 0;
+      const memberNames = parseNames(document.getElementById('allMembers').value);
       const resultDiv = document.getElementById('result');
 
-      const drinkerCount = drinkers.length;
-      const nonDrinkerCount = nonDrinkers.length;
-      const totalPeople = drinkerCount + nonDrinkerCount;
+      const totalPeople = memberNames.length;
 
       if (totalPeople === 0) {
-        alert(t.alertNoPeople);
+        alert(t.alertNoMembers);
         return;
       }
 
-      // 項目データの取得と合計・個人立替額の集計
+      // 各自の追加負担額集計
+      const extraPayMap = {};
+      let totalExtraAdded = 0;
+
+      const extraRows = document.querySelectorAll('.extra-row');
+      extraRows.forEach(row => {
+        const names = parseNames(row.querySelector('.extra-names').value);
+        const amount = parseFloat(row.querySelector('.extra-amount').value) || 0;
+        
+        if (amount > 0 && names.length > 0) {
+          names.forEach(name => {
+            extraPayMap[name] = (extraPayMap[name] || 0) + amount;
+            totalExtraAdded += amount;
+          });
+        }
+      });
+
+      // 支払い項目の集計
       let totalAmount = 0;
       const paidByPerson = {};
       const itemSummaries = [];
 
-      const rows = document.querySelectorAll('.item-row');
+      const rows = document.querySelectorAll('#itemList .item-row');
       rows.forEach(row => {
         const name = row.querySelector('.item-name').value.trim() || t.defaultItem;
         const price = parseFloat(row.querySelector('.item-price').value) || 0;
-        const payer = row.querySelector('.item-payer').value.trim() || t.defaultPayer;
+        const payer = row.querySelector('.item-payer').value.trim();
 
         if (price > 0) {
           totalAmount += price;
-          paidByPerson[payer] = (paidByPerson[payer] || 0) + price;
-          itemSummaries.push(`・${name}: ${price.toLocaleString()} (${payer})`);
+          if (payer) {
+            paidByPerson[payer] = (paidByPerson[payer] || 0) + price;
+          }
+          itemSummaries.push(`・${name}: ${price.toLocaleString()}円 (${payer || t.defaultPayer})`);
         }
       });
 
@@ -308,24 +345,28 @@
         return;
       }
 
-      // 各自の負担額計算
-      const basePay = (totalAmount - (drinkerCount * extra)) / totalPeople;
-      let nonDrinkerPay = Math.round(basePay);
-      let drinkerPay = nonDrinkerPay + extra;
+      // ベース金額の計算
+      const basePay = (totalAmount - totalExtraAdded) / totalPeople;
+      let roundedBasePay = Math.round(basePay);
 
-      // 端数調整
-      const calculatedTotal = (drinkerPay * drinkerCount) + (nonDrinkerPay * nonDrinkerCount);
+      const allMembers = memberNames.map(name => {
+        const extraAdd = extraPayMap[name] || 0;
+        return {
+          name,
+          isExtra: extraAdd > 0,
+          targetPay: roundedBasePay + extraAdd
+        };
+      });
+
+      // 端数調整（最初のメンバーで吸収）
+      const calculatedTotal = allMembers.reduce((sum, m) => sum + m.targetPay, 0);
       const diffAdjust = totalAmount - calculatedTotal;
-      
-      const allMembers = [];
-      drinkers.forEach(name => allMembers.push({ name, isDrinker: true, targetPay: drinkerPay }));
-      nonDrinkers.forEach(name => allMembers.push({ name, isDrinker: false, targetPay: nonDrinkerPay }));
 
       if (diffAdjust !== 0 && allMembers.length > 0) {
         allMembers[0].targetPay += diffAdjust;
       }
 
-      // 精算結果テキスト作成
+      // 表示およびメッセージ作成
       let memberResultsHTML = "";
       let shareTextMembers = "";
 
@@ -333,53 +374,52 @@
         const paid = paidByPerson[m.name] || 0;
         const diff = m.targetPay - paid;
         const nameDisplay = m.name + (t.san ? t.san : "");
+        const icon = '👤';
 
         let diffText = "";
         let cssClass = "";
         if (diff > 0) {
-          diffText = `${t.payText}: ${diff.toLocaleString()}`;
+          diffText = `${t.payText}: ${diff.toLocaleString()} 円`;
           cssClass = "pay-plus";
-          shareTextMembers += `・${nameDisplay} (${m.isDrinker ? '🍺' : '🍵'}): 【${diff.toLocaleString()} ${t.sharePay}】 (${t.costLabel}: ${m.targetPay.toLocaleString()} / ${t.paidLabel}: ${paid.toLocaleString()})\n`;
+          shareTextMembers += `・${nameDisplay} (${icon}): 【${diff.toLocaleString()}円 ${t.sharePay}】 (${t.costLabel}: ${m.targetPay.toLocaleString()}円 / ${t.paidLabel}: ${paid.toLocaleString()}円)\n`;
         } else if (diff < 0) {
           const refund = Math.abs(diff);
-          diffText = `${t.receiveText}: ${refund.toLocaleString()}`;
+          diffText = `${t.receiveText}: ${refund.toLocaleString()} 円`;
           cssClass = "pay-minus";
-          shareTextMembers += `・${nameDisplay} (${m.isDrinker ? '🍺' : '🍵'}): 【${refund.toLocaleString()} ${t.shareReceive}】 (${t.costLabel}: ${m.targetPay.toLocaleString()} / ${t.paidLabel}: ${paid.toLocaleString()})\n`;
+          shareTextMembers += `・${nameDisplay} (${icon}): 【${refund.toLocaleString()}円 ${t.shareReceive}】 (${t.costLabel}: ${m.targetPay.toLocaleString()}円 / ${t.paidLabel}: ${paid.toLocaleString()}円)\n`;
         } else {
           diffText = `${t.settledText}`;
-          shareTextMembers += `・${nameDisplay} (${m.isDrinker ? '🍺' : '🍵'}): ${t.shareSettled}\n`;
+          shareTextMembers += `・${nameDisplay} (${icon}): ${t.shareSettled}\n`;
         }
 
         memberResultsHTML += `
           <div class="result-item">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span class="person-name">${m.isDrinker ? '🍺' : '🍵'} ${nameDisplay}</span>
+              <span class="person-name">${icon} ${nameDisplay}</span>
               <span class="pay-amount ${cssClass}">${diffText}</span>
             </div>
             <div class="person-detail">
-              ${t.costLabel}: ${m.targetPay.toLocaleString()} / ${t.paidLabel}: ${paid.toLocaleString()}
+              ${t.costLabel}: ${m.targetPay.toLocaleString()}円 / ${t.paidLabel}: ${paid.toLocaleString()}円
             </div>
           </div>
         `;
       });
 
-      // LINE共有テキスト構築
-      const noteText = t.shareNote.replace('{extra}', extra.toLocaleString());
+      const noteText = totalExtraAdded > 0 ? `\n${t.shareNote}` : '';
       shareText = `${t.shareTitle}\n`
-                + `${t.shareTotal}: ${totalAmount.toLocaleString()}\n\n`
+                + `${t.shareTotal}: ${totalAmount.toLocaleString()}円\n\n`
                 + `${t.shareBreakdown}\n${itemSummaries.join('\n')}\n\n`
-                + `${t.shareResult}\n${shareTextMembers}\n`
+                + `${t.shareResult}\n${shareTextMembers}`
                 + `${noteText}\n`
                 + `${t.shareThanks}`;
 
       const lineUrl = `https://line.me/R/msg/text/?${encodeURIComponent(shareText)}`;
 
-      // 画面出力
       resultDiv.style.display = 'block';
       resultDiv.innerHTML = `
         <div class="total-summary">
-          <strong>${t.totalSummary}: ${totalAmount.toLocaleString()}</strong><br>
-          <span style="font-size:0.85em; color:#555;">(${t.drinkerBase}: ${drinkerPay.toLocaleString()} / ${t.nonDrinkerBase}: ${nonDrinkerPay.toLocaleString()} ${t.baseLabel})</span>
+          <strong>${t.totalSummary}: ${totalAmount.toLocaleString()} 円</strong><br>
+          <span style="font-size:0.85em; color:#555;">(${t.baseLabel}: ${roundedBasePay.toLocaleString()}円)</span>
         </div>
 
         ${memberResultsHTML}
