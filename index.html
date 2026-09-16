@@ -183,7 +183,7 @@
     }
     .btn-add:hover { background: #F0EEE6; border-color: #BCB8AD; }
 
-    /* 多めに払う人グループ（枠の大きさを揃えるため flex: 1 で均等に） */
+    /* 多めに払う人グループ */
     .extra-row { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; }
     .extra-names { flex: 1; }
     .extra-amount { flex: 1; }
@@ -529,12 +529,10 @@
       return inputStr.split(/[\s,、 ]+/).filter(name => name.trim() !== "");
     }
 
-    // 数値を小数第2位までに丸める関数
     function round2(num) {
       return Math.round(num * 100) / 100;
     }
 
-    // 表示用の数値フォーマット（小数第2位まで、不要な末尾の0はカット、小数点以下がなければ整数）
     function formatNum(num) {
       return Number(round2(num).toFixed(2));
     }
@@ -592,6 +590,7 @@
         return;
       }
 
+      // 追加額を引いた残りの総額を全員で均等割りするベースとする
       const basePay = round2((totalAmount - totalExtraAdded) / totalPeople);
 
       const allMembers = memberNames.map(name => {
@@ -599,6 +598,7 @@
         return {
           name,
           isExtra: extraAdd > 0,
+          // ベース額にその人の追加額をそのまま上乗せして個人の負担額とする
           targetPay: round2(basePay + extraAdd)
         };
       });
