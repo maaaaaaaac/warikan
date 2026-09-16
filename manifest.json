@@ -1,0 +1,18 @@
+{
+  "name": "WARIKAN",
+  "short_name": "WARIKAN",
+  "start_url": "./",
+  "display": "standalone",
+  "icons": [
+    {
+      "src": "warikan-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "warikan-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
