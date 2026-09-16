@@ -549,22 +549,6 @@
         return;
       }
 
-      const extraPayMap = {};
-      let totalExtraAdded = 0;
-
-      const extraRows = document.querySelectorAll('.extra-row');
-      extraRows.forEach(row => {
-        const names = parseNames(row.querySelector('.extra-names').value);
-        const amount = parseFloat(row.querySelector('.extra-amount').value) || 0;
-        
-        if (amount > 0 && names.length > 0) {
-          names.forEach(name => {
-            extraPayMap[name] = round2((extraPayMap[name] || 0) + amount);
-            totalExtraAdded = round2(totalExtraAdded + amount);
-          });
-        }
-      });
-
       let totalAmount = 0;
       const paidByPerson = {};
       const itemSummaries = [];
@@ -590,7 +574,23 @@
         return;
       }
 
-      // 修正：全体の合計から「多めに払う人の追加額の総額」を引いた残りを全員で均等割りするベースとする
+      const extraPayMap = {};
+      let totalExtraAdded = 0;
+
+      const extraRows = document.querySelectorAll('.extra-row');
+      extraRows.forEach(row => {
+        const names = parseNames(row.querySelector('.extra-names').value);
+        const amount = parseFloat(row.querySelector('.extra-amount').value) || 0;
+        
+        if (amount > 0 && names.length > 0) {
+          names.forEach(name => {
+            extraPayMap[name] = round2((extraPayMap[name] || 0) + amount);
+            totalExtraAdded = round2(totalExtraAdded + amount);
+          });
+        }
+      });
+
+      // 修正：立替総額から追加額の合計を引いた残りを全員で均等割りするベースとする
       const basePay = round2((totalAmount - totalExtraAdded) / totalPeople);
 
       const allMembers = memberNames.map(name => {
@@ -598,7 +598,7 @@
         return {
           name,
           isExtra: extraAdd > 0,
-          // 基本額に、その人の追加額を足したものが最終的な負担額
+          // 基本ベース額に、その人の追加額を足したものが最終的な負担額
           targetPay: round2(basePay + extraAdd)
         };
       });
