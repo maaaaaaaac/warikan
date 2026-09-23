@@ -144,11 +144,11 @@
       background-color: #FFFFFF;
     }
 
-    /* 立替項目の動的リスト */
+    /* 立替項目の動的リスト（払った人・金額・項目 の順） */
     .item-row { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; }
-    .item-name { flex: 1.2; }
-    .item-price { flex: 1; }
     .item-payer { flex: 1; }
+    .item-price { flex: 1; }
+    .item-name { flex: 1.2; }
     
     .btn-del {
       background: transparent;
@@ -265,6 +265,17 @@
       transition: background 0.2s;
     }
     .btn-copy:hover { background: #E5E1D8; }
+
+    /* 免責事項フッター */
+    .footer-disclaimer {
+      margin-top: 40px;
+      padding-top: 15px;
+      border-top: 1px solid #E8E6DF;
+      font-size: 0.75em;
+      color: #999;
+      text-align: center;
+      line-height: 1.5;
+    }
   </style>
 </head>
 <body>
@@ -292,14 +303,14 @@
     </div>
   </div>
 
-  <!-- 2. 支払い -->
+  <!-- 2. 支払い（払った人・金額・項目） -->
   <div class="card">
     <div class="card-title" data-i18n="step2Title">2. 支払い</div>
     <div id="itemList">
       <div class="item-row">
-        <input type="text" class="item-name" placeholder="項目" data-i18n-ph="phItem" value="">
-        <input type="number" pattern="[0-9]*" class="item-price" inputmode="numeric" placeholder="金額" data-i18n-ph="phPrice" value="">
         <input type="text" class="item-payer" placeholder="払った人" data-i18n-ph="phPayer" value="">
+        <input type="number" pattern="[0-9]*" class="item-price" inputmode="numeric" placeholder="金額" data-i18n-ph="phPrice" value="">
+        <input type="text" class="item-name" placeholder="項目" data-i18n-ph="phItem" value="">
         <button class="btn-del" onclick="removeItem(this)">×</button>
       </div>
     </div>
@@ -328,6 +339,11 @@
 
   <!-- 計算結果 -->
   <div class="result" id="result" style="display:none;"></div>
+
+  <!-- 免責事項フッター（自動切替対応） -->
+  <div class="footer-disclaimer" data-i18n="disclaimerText">
+    【免責事項】本アプリの利用による金銭的な差異やトラブルについて、開発者は一切の責任を負いません。
+  </div>
 
   <script>
     let currentLang = 'ja';
@@ -377,7 +393,8 @@
         totalSummary: "全体の合計",
         baseLabel: "基本額",
         costLabel: "負担",
-        paidLabel: "立替"
+        paidLabel: "立替",
+        disclaimerText: "【免責事項】本アプリの利用による金銭的な差異やトラブルについて、開発者は一切の責任を負いません。"
       },
       en: {
         step1Title: "1. Members",
@@ -422,7 +439,8 @@
         totalSummary: "Total Amount",
         baseLabel: "Base",
         costLabel: "Cost",
-        paidLabel: "Paid"
+        paidLabel: "Paid",
+        disclaimerText: "Disclaimer: This app is provided \"as is\" without warranty of any kind. The developer is not responsible for any financial discrepancies or disputes arising from the use of this app."
       }
     };
 
@@ -452,9 +470,9 @@
       div.className = 'item-row';
       const t = i18n[currentLang];
       div.innerHTML = `
-        <input type="text" class="item-name" placeholder="${t.phItem}" data-i18n-ph="phItem">
-        <input type="number" pattern="[0-9]*" class="item-price" inputmode="numeric" placeholder="${t.phPrice}" data-i18n-ph="phPrice">
         <input type="text" class="item-payer" placeholder="${t.phPayer}" data-i18n-ph="phPayer">
+        <input type="number" pattern="[0-9]*" class="item-price" inputmode="numeric" placeholder="${t.phPrice}" data-i18n-ph="phPrice">
+        <input type="text" class="item-name" placeholder="${t.phItem}" data-i18n-ph="phItem">
         <button class="btn-del" onclick="removeItem(this)">×</button>
       `;
       itemList.appendChild(div);
@@ -502,9 +520,9 @@
       const itemList = document.getElementById('itemList');
       itemList.innerHTML = `
         <div class="item-row">
-          <input type="text" class="item-name" placeholder="${t.phItem}" data-i18n-ph="phItem" value="">
-          <input type="number" pattern="[0-9]*" class="item-price" inputmode="numeric" placeholder="${t.phPrice}" data-i18n-ph="phPrice" value="">
           <input type="text" class="item-payer" placeholder="${t.phPayer}" data-i18n-ph="phPayer" value="">
+          <input type="number" pattern="[0-9]*" class="item-price" inputmode="numeric" placeholder="${t.phPrice}" data-i18n-ph="phPrice" value="">
+          <input type="text" class="item-name" placeholder="${t.phItem}" data-i18n-ph="phItem" value="">
           <button class="btn-del" onclick="removeItem(this)">×</button>
         </div>
       `;
@@ -555,9 +573,9 @@
 
       const rows = document.querySelectorAll('#itemList .item-row');
       rows.forEach(row => {
-        const name = row.querySelector('.item-name').value.trim() || t.defaultItem;
-        const price = parseFloat(row.querySelector('.item-price').value) || 0;
         const payer = row.querySelector('.item-payer').value.trim();
+        const price = parseFloat(row.querySelector('.item-price').value) || 0;
+        const name = row.querySelector('.item-name').value.trim() || t.defaultItem;
 
         if (price > 0) {
           totalAmount = round2(totalAmount + price);
@@ -590,7 +608,6 @@
         }
       });
 
-      // 修正：立替総額から追加額の合計を引いた残りを全員で均等割りするベースとする
       const basePay = round2((totalAmount - totalExtraAdded) / totalPeople);
 
       const allMembers = memberNames.map(name => {
@@ -598,7 +615,6 @@
         return {
           name,
           isExtra: extraAdd > 0,
-          // 基本ベース額に、その人の追加額を足したものが最終的な負担額
           targetPay: round2(basePay + extraAdd)
         };
       });
@@ -659,6 +675,7 @@
 
       const lineUrl = `https://line.me/R/msg/text/?${encodeURIComponent(shareText)}`;
 
+      resultDirStyle = 'block';
       resultDiv.style.display = 'block';
       resultDiv.innerHTML = `
         <div class="total-summary">
