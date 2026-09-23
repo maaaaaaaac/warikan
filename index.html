@@ -144,7 +144,7 @@
       background-color: #FFFFFF;
     }
 
-    /* 立替項目の動的リスト（払った人・金額・項目 の順） */
+    /* 立替項目の動的リスト */
     .item-row { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; }
     .item-payer { flex: 1; }
     .item-price { flex: 1; }
@@ -266,16 +266,36 @@
     }
     .btn-copy:hover { background: #E5E1D8; }
 
-    /* 免責事項フッター（全体を太字に） */
+    /* Buy Me a Coffee ボタン */
+    .btn-coffee {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 12px;
+      margin-top: 30px;
+      background-color: #FFDD00;
+      color: #000000;
+      border: 1px solid #E6C700;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95em;
+      text-decoration: none;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+      transition: background-color 0.2s, transform 0.1s;
+    }
+    .btn-coffee:hover { background-color: #F4D200; }
+    .btn-coffee:active { transform: scale(0.99); }
+
+    /* 免責事項フッター */
     .footer-disclaimer {
-      margin-top: 40px;
+      margin-top: 20px;
       padding-top: 15px;
       border-top: 1px solid #E8E6DF;
       font-size: 0.72em;
-      color: #999;
+      color: #777;
       text-align: left;
       line-height: 1.4;
-      font-weight: bold;
     }
   </style>
 </head>
@@ -341,11 +361,14 @@
   <!-- 計算結果 -->
   <div class="result" id="result" style="display:none;"></div>
 
-  <!-- 免責事項フッター（行間なし・全体太字） -->
+  <!-- Buy Me a Coffee ボタン -->
+  <a class="btn-coffee" href="https://buymeacoffee.com/crtr.mac" target="_blank" rel="noopener noreferrer">
+    ☕ Buy Me a Coffee
+  </a>
+
+  <!-- 免責事項フッター -->
   <div class="footer-disclaimer" data-i18n="disclaimerText">
-    ⚠️ 免責事項<br>
-    本アプリは、計算結果の正確性や動作を保証するものではありません。<br>
-    本アプリの利用によって生じた金銭的な差異、トラブル、損害等について、開発者は一切の責任を負いません。ご利用の際は、計算結果をご自身でご確認ください。
+    <strong>⚠️ 免責事項<br>本アプリは、計算結果の正確性や動作を保証するものではありません。<br>本アプリの利用によって生じた金銭的な差異、トラブル、損害等について、開発者は一切の責任を負いません。ご利用の際は、計算結果をご自身でご確認ください。</strong>
   </div>
 
   <script>
@@ -397,7 +420,7 @@
         baseLabel: "基本額",
         costLabel: "負担",
         paidLabel: "立替",
-        disclaimerText: "⚠️ 免責事項<br>本アプリは、計算結果の正確性や動作を保証するものではありません。<br>本アプリの利用によって生じた金銭的な差異、トラブル、損害等について、開発者は一切の責任を負いません。ご利用の際は、計算結果をご自身でご確認ください。"
+        disclaimerText: "<strong>⚠️ 免責事項<br>本アプリは、計算結果の正確性や動作を保証するものではありません。<br>本アプリの利用によって生じた金銭的な差異、トラブル、損害等について、開発者は一切の責任を負いません。ご利用の際は、計算結果をご自身でご確認ください。</strong>"
       },
       en: {
         step1Title: "1. Members",
@@ -443,7 +466,7 @@
         baseLabel: "Base",
         costLabel: "Cost",
         paidLabel: "Paid",
-        disclaimerText: "⚠️ Disclaimer<br>This app does not guarantee the accuracy or operation of the calculation results.<br>The developer assumes no responsibility for any financial discrepancies, disputes, or damages arising from the use of this app. Please verify the results yourself."
+        disclaimerText: "<strong>⚠️ Disclaimer<br>This app does not guarantee the accuracy or operation of the calculation results.<br>The developer assumes no responsibility for any financial discrepancies, disputes, or damages arising from the use of this app. Please verify the results yourself.</strong>"
       }
     };
 
