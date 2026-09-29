@@ -144,11 +144,18 @@
       background-color: #FFFFFF;
     }
 
-    /* 立替項目の動的リスト */
-    .item-row { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; }
-    .item-payer { flex: 1; }
-    .item-price { flex: 1; }
-    .item-name { flex: 1.2; }
+    /* 3カラム共通の幅設定（均等に揃える） */
+    .item-row, .extra-row { 
+      display: flex; 
+      gap: 8px; 
+      margin-bottom: 10px; 
+      align-items: center; 
+    }
+    .item-payer, .item-price, .item-name,
+    .extra-names, .extra-amount, .extra-name { 
+      flex: 1; 
+      min-width: 0; 
+    }
     
     .btn-del {
       background: transparent;
@@ -182,12 +189,6 @@
       transition: all 0.2s;
     }
     .btn-add:hover { background: #F0EEE6; border-color: #BCB8AD; }
-
-    /* 多めに払う人グループ */
-    .extra-row { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; }
-    .extra-names { flex: 1; }
-    .extra-amount { flex: 1; }
-    .extra-name { flex: 1.2; }
 
     /* メインボタン */
     .btn-calc {
@@ -327,12 +328,12 @@
     </div>
   </div>
 
-  <!-- 2. 支払い（払った人・金額・項目） -->
+  <!-- 2. 支払い（支払った人・金額・項目） -->
   <div class="card">
     <div class="card-title" data-i18n="step2Title">2. 支払い</div>
     <div id="itemList">
       <div class="item-row">
-        <input type="text" class="item-payer" placeholder="払った人" data-i18n-ph="phPayer" value="">
+        <input type="text" class="item-payer" placeholder="支払った人" data-i18n-ph="phPayer" value="">
         <input type="number" pattern="[0-9]*" class="item-price" inputmode="numeric" placeholder="金額" data-i18n-ph="phPrice" value="">
         <input type="text" class="item-name" placeholder="項目" data-i18n-ph="phItem" value="">
         <button class="btn-del" onclick="removeItem(this)">×</button>
@@ -346,10 +347,10 @@
     <div class="card-title" data-i18n="step3Title">3. 調整</div>
     
     <div class="input-group" style="margin-bottom:0;">
-      <label><span data-i18n="labelExtraPayers">多めに払う人と追加額</span><span class="sub-label" data-i18n="subSpaceOptional">（任意）</span></label>
+      <label><span data-i18n="labelExtraPayers">支払う人・追加額・項目</span><span class="sub-label" data-i18n="subSpaceOptional">（任意）</span></label>
       <div id="extraList">
         <div class="extra-row">
-          <input type="text" class="extra-names" placeholder="多めに払う人" data-i18n-ph="phExtraPayers" value="">
+          <input type="text" class="extra-names" placeholder="支払う人" data-i18n-ph="phExtraPayers" value="">
           <input type="number" pattern="[0-9]*" class="extra-amount" inputmode="numeric" placeholder="追加額" data-i18n-ph="phExtra" value="">
           <input type="text" class="extra-name" placeholder="項目" data-i18n-ph="phItem" value="">
           <button class="btn-del" onclick="removeExtra(this)">×</button>
@@ -387,7 +388,7 @@
         step2Title: "2. 支払い",
         step3Title: "3. 調整",
         labelMembers: "全員の名前",
-        labelExtraPayers: "多めに払う人と追加額",
+        labelExtraPayers: "支払う人・追加額・項目",
         subSpace: "（スペース区切り）",
         subSpaceOptional: "（任意）",
         btnAddItem: "＋ 支払項目を追加",
@@ -395,8 +396,8 @@
         phMembers: "例: たつや かずや みなみ",
         phItem: "項目",
         phPrice: "金額",
-        phPayer: "払った人",
-        phExtraPayers: "多めに払う人",
+        phPayer: "支払った人",
+        phExtraPayers: "支払う人",
         phExtra: "追加額",
         alertMinItem: "最低1つの項目が必要です。",
         alertNoMembers: "メンバー全員の名前を入力してください。",
@@ -433,17 +434,17 @@
         step2Title: "2. Payments",
         step3Title: "3. Adjustments",
         labelMembers: "All Member Names",
-        labelExtraPayers: "Extra Payer & Amount",
+        labelExtraPayers: "Payer, Amount & Item",
         subSpace: "(Separated by space)",
         subSpaceOptional: "(Optional)",
         btnAddItem: "+ Add Item",
-        btnAddExtra: "+ Add Payer",
+        btnAddExtra: "+ Add",
         phMembers: "e.g. Mike Will Dustin",
         phItem: "Item",
         phPrice: "Amount",
         phPayer: "Paid by",
-        phExtraPayers: "Extra Payer",
-        phExtra: "Extra Amount",
+        phExtraPayers: "Payer",
+        phExtra: "Amount",
         alertMinItem: "At least one item is required.",
         alertNoMembers: "Please enter member names.",
         alertNoAmount: "Please enter total expense amount.",
