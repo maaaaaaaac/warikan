@@ -153,21 +153,16 @@
       background-color: #FFFFFF;
     }
 
-    /* 3カラムの幅調整（項目欄・理由欄だけ少し小さく） */
+    /* 3カラムの幅を均等に揃える */
     .item-row, .extra-row { 
       display: flex; 
       gap: 8px; 
       margin-bottom: 10px; 
       align-items: center; 
     }
-    .item-payer, .item-price,
-    .extra-names, .extra-amount { 
-      flex: 1.1; 
-      min-width: 0; 
-    }
-    .item-name,
-    .extra-name { 
-      flex: 0.8; 
+    .item-payer, .item-price, .item-name,
+    .extra-names, .extra-amount, .extra-name { 
+      flex: 1; 
       min-width: 0; 
     }
     
