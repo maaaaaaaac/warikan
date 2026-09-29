@@ -187,6 +187,7 @@
     .extra-row { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; }
     .extra-names { flex: 1; }
     .extra-amount { flex: 1; }
+    .extra-name { flex: 1.2; }
 
     /* メインボタン */
     .btn-calc {
@@ -350,6 +351,7 @@
         <div class="extra-row">
           <input type="text" class="extra-names" placeholder="多めに払う人" data-i18n-ph="phExtraPayers" value="">
           <input type="number" pattern="[0-9]*" class="extra-amount" inputmode="numeric" placeholder="追加額" data-i18n-ph="phExtra" value="">
+          <input type="text" class="extra-name" placeholder="項目" data-i18n-ph="phItem" value="">
           <button class="btn-del" onclick="removeExtra(this)">×</button>
         </div>
       </div>
@@ -527,6 +529,7 @@
       div.innerHTML = `
         <input type="text" class="extra-names" placeholder="${t.phExtraPayers}" data-i18n-ph="phExtraPayers">
         <input type="number" pattern="[0-9]*" class="extra-amount" inputmode="numeric" placeholder="${t.phExtra}" data-i18n-ph="phExtra">
+        <input type="text" class="extra-name" placeholder="${t.phItem}" data-i18n-ph="phItem">
         <button class="btn-del" onclick="removeExtra(this)">×</button>
       `;
       extraList.appendChild(div);
@@ -540,6 +543,7 @@
         const row = rows[0];
         row.querySelector('.extra-names').value = '';
         row.querySelector('.extra-amount').value = '';
+        row.querySelector('.extra-name').value = '';
       }
     }
 
@@ -564,6 +568,7 @@
         <div class="extra-row">
           <input type="text" class="extra-names" placeholder="${t.phExtraPayers}" data-i18n-ph="phExtraPayers" value="">
           <input type="number" pattern="[0-9]*" class="extra-amount" inputmode="numeric" placeholder="${t.phExtra}" data-i18n-ph="phExtra" value="">
+          <input type="text" class="extra-name" placeholder="${t.phItem}" data-i18n-ph="phItem" value="">
           <button class="btn-del" onclick="removeExtra(this)">×</button>
         </div>
       `;
@@ -733,6 +738,5 @@
       });
     }
   </script>
-
 </body>
 </html>
