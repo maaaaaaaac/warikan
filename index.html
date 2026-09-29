@@ -144,16 +144,21 @@
       background-color: #FFFFFF;
     }
 
-    /* 3カラム共通の幅設定（均等に揃える） */
+    /* 3カラムの幅調整（項目欄だけ少し小さく） */
     .item-row, .extra-row { 
       display: flex; 
       gap: 8px; 
       margin-bottom: 10px; 
       align-items: center; 
     }
-    .item-payer, .item-price, .item-name,
-    .extra-names, .extra-amount, .extra-name { 
-      flex: 1; 
+    .item-payer, .item-price,
+    .extra-names, .extra-amount { 
+      flex: 1.1; 
+      min-width: 0; 
+    }
+    .item-name,
+    .extra-name { 
+      flex: 0.8; 
       min-width: 0; 
     }
     
@@ -328,7 +333,7 @@
     </div>
   </div>
 
-  <!-- 2. 支払い（支払った人・金額・項目） -->
+  <!-- 2. 支払い -->
   <div class="card">
     <div class="card-title" data-i18n="step2Title">2. 支払い</div>
     <div id="itemList">
