@@ -113,6 +113,15 @@
       letter-spacing: 0.05em;
     }
     
+    /* セクション内の補足説明用スタイル */
+    .card-desc {
+      font-size: 0.78em;
+      color: #8C8A82;
+      margin-top: -8px;
+      margin-bottom: 14px;
+      line-height: 1.4;
+    }
+    
     .input-group { margin-bottom: 0; }
     label {
       display: block;
@@ -347,9 +356,10 @@
     <button class="btn-add" id="btnAddItem" onclick="addItem()" data-i18n="btnAddItem">＋ 支払項目を追加</button>
   </div>
 
-  <!-- 3. 調整 -->
+  <!-- 3. 個別調整（お酒代など） -->
   <div class="card">
-    <div class="card-title" data-i18n="step3Title">3. 調整</div>
+    <div class="card-title" data-i18n="step3Title">3. 個別調整（お酒代など）</div>
+    <div class="card-desc" data-i18n="step3Desc">よく飲む人や、多めに払う人の追加金額を入力してください</div>
     
     <div class="input-group" style="margin-bottom:0;">
       <div id="extraList">
@@ -390,7 +400,8 @@
       ja: {
         step1Title: "1. メンバー",
         step2Title: "2. 支払い",
-        step3Title: "3. 調整",
+        step3Title: "3. 個別調整（お酒代など）",
+        step3Desc: "よく飲む人や、多めに払う人の追加金額を入力してください",
         labelMembers: "全員の名前",
         subSpace: "（スペース区切り）",
         btnAddItem: "＋ 支払項目を追加",
@@ -434,7 +445,8 @@
       en: {
         step1Title: "1. Members",
         step2Title: "2. Payments",
-        step3Title: "3. Adjustments",
+        step3Title: "3. Adjustments (e.g., Drinks)",
+        step3Desc: "Enter extra amounts for heavy drinkers or those paying more",
         labelMembers: "All Member Names",
         subSpace: "(Separated by space)",
         btnAddItem: "+ Add Item",
