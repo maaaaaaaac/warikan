@@ -338,7 +338,7 @@
     <div class="card-title" data-i18n="step2Title">2. 支払い</div>
     <div id="itemList">
       <div class="item-row">
-        <input type="text" class="item-payer" placeholder="支払った人" data-i18n-ph="phPayer" value="">
+        <input type="text" class="item-payer" placeholder="名前" data-i18n-ph="phPayer" value="">
         <input type="number" pattern="[0-9]*" class="item-price" inputmode="numeric" placeholder="金額" data-i18n-ph="phPrice" value="">
         <input type="text" class="item-name" placeholder="項目" data-i18n-ph="phItem" value="">
         <button class="btn-del" onclick="removeItem(this)">×</button>
@@ -354,7 +354,7 @@
     <div class="input-group" style="margin-bottom:0;">
       <div id="extraList">
         <div class="extra-row">
-          <input type="text" class="extra-names" placeholder="支払う人" data-i18n-ph="phExtraPayers" value="">
+          <input type="text" class="extra-names" placeholder="名前" data-i18n-ph="phExtraPayers" value="">
           <input type="number" pattern="[0-9]*" class="extra-amount" inputmode="numeric" placeholder="追加額" data-i18n-ph="phExtra" value="">
           <input type="text" class="extra-name" placeholder="項目" data-i18n-ph="phItem" value="">
           <button class="btn-del" onclick="removeExtra(this)">×</button>
@@ -398,8 +398,8 @@
         phMembers: "例: たつや かずや みなみ",
         phItem: "項目",
         phPrice: "金額",
-        phPayer: "支払った人",
-        phExtraPayers: "支払う人",
+        phPayer: "名前",
+        phExtraPayers: "名前",
         phExtra: "追加額",
         alertMinItem: "最低1つの項目が必要です。",
         alertNoMembers: "メンバー全員の名前を入力してください。",
@@ -442,8 +442,8 @@
         phMembers: "e.g. Mike Will Dustin",
         phItem: "Item",
         phPrice: "Amount",
-        phPayer: "Paid by",
-        phExtraPayers: "Payer",
+        phPayer: "Name",
+        phExtraPayers: "Name",
         phExtra: "Amount",
         alertMinItem: "At least one item is required.",
         alertNoMembers: "Please enter member names.",
